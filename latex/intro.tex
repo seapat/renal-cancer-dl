@@ -1,0 +1,45 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Einleitung
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}\label{Introduction}
+
+\section{Motivation}
+
+Since the 1960s, the number of new cases of renal cell carcinoma (RCC) has been increasing in the United States and in Europe. It is the 14th most common type of cancer worldwide \cite{Hancock2023Kidney} and even more common in the western world. In the United States in 2018, RCC was among the top ten most common cancers, with the incidence rising as well. \cite{Chowdhury2020Kidney} 
+Thanks to modern imaging techniques, about 75\% of renal tumours are detected in stage I. This allows surgical or ablational treatment to be viable and effective options and to ensure long-term disease-free survival. \cite{Hancock2023Kidney}
+However, this also means that for the rest of patients, the tumour has already metastasised before it is detected. This makes those cases much more difficult to treat. Furthermore, approximately 40\% of the patients treated with surgery experience recurrence of the cancer in the future. \cite{Hancock2023Kidney}
+For these reasons, it is important to continue investigating the causes and mechanics of the disease. An important aspect of RCC-focused research is the search for fundamentally novel biomarkers.
+As biomarkers are defined by their purpose, that is the use for diagnosis, prediction and monitoring, they can be almost anything. Hence, biomarkers can have any form and origin. 
+% https://ascpt.onlinelibrary.wiley.com/doi/full/10.1067/mcp.2001.113989
+Examples can be specific molecules concentrations, cell phenotypes, biomolecule localisations and many more. New biomarkers can help to improve the early detection of cancer. Especially for renal cell carcinoma, due to the various subtypes and the additional heterogeneity of tumour phenotypes, a considerable number cannot be properly identified. \cite{Hsieh2017Renal} Likewise, the risk of misclassifications is considerable as well. Because of these threats, there is still a need for better biomarkers, not only for detection but also for prognosis.
+The currently predominant methods of grading cancer progression and performing predictions, are conducted by humans. Examples are the Gleason score for grading prostate cancer or the American Joint Committee on Cancer (AJCC) TNM system for kidney cancer.
+%https://www.cancer.org/cancer/kidney-cancer/detection-diagnosis-staging/staging.html 
+% https://www.sciencedirect.com/science/article/pii/S0893395222044064?via%3Dihub
+These systems suffer from multiple issues. For once, they rely on the capabilities of the analyst. Factors such as eyesight, experience, patience, or consistency can severely impact the resulting score. The human factor involved introduces the risk of subjective scoring based on factors that should are not part of the respective scoring schemes. Furthermore, the definitions of such categories can often be vague. Hence, the analyst might misclassify a patient unknowingly. Lastly, often these scores can be too coarse, and the patient groups show significant internal differences, so that uniform treatment becomes unfeasible. This coarseness often stems from the age of such systems. We often know much more about a disease than it was the case when these scores were defined. Naturally, they fail to properly capture the whole spectrum of factors that are known to medicine today. 
+In addition, identifying biomarkers for the reliable and early detection of recurrence are especially needed to establish control over the disease and to increase the long-term quality of life of those affected. 
+
+\section{Overview}
+
+The aim of this work is to develop a deep neural network (DNN) that combines different modalities of patient-specific data. The final goal is to use this network to find new biomarkers, that have been and would stay hidden if it was not for the capabilities of neural networks. As deep learning makes it possible to utilise multi-facetted relations that are obscured by highly complex data, it has only become possible to find such biomarkers over recent years.
+Therefore, the intermediate goal of the network is to predict the log hazard ratio in order to relate a patient data to his or her expected survival. This is a necessary step to be able to find biomarkers that are not only undetected, but also predictive for the development of the disease.
+For this purpose, a two-part network is built, where the first part is trained on whole slide images (WSI) of samples of kidney tissue. Each patient contributes multiple, differently stained samples that reveal the location of specific cell types in the tissue. These stains either reveal the overall position of almost all cells and biomolecules within the tissue, or only highlight very specific cells that are part of the human immune system.
+The second part of the network is trained on gene expression data that originates from a subcohort of these patients. Such a multimodal network allows discovering inter-modal relations that would be impossible to detect by humans.
+A convolutional neural network is employed to analyse the image data and obtain a lower dimensional representation that contains its structural characteristics. The gene expression data is processed analogously by a special type of fully connected network, where cross-correlations between all genes can be discovered and summarised in a lower dimensional feature representation as well. 
+Intermediate fusion is performed after features are extracted from each modality. This is done by various techniques in order to determine the best in terms of performance and convergence speed. 
+The obtained joint representation is then used for hazard estimation. As a final goal, the obtained network is then analysed using interpretability methods for gaining new insights on factors that influence patient survival expectancy and to define new potential biomarkers from these findings.
+Furthermore, our image data is enhanced by regional annotations which are transformed into binary masks, fused with their respective WSI and provided as a singular input to the neural network. Compared to previous work, this pixel-level information provides a new level of granularity. We hypothesise that survival analysis requires a comprehensive view for each sample, which we aim to provide in this work. To the best of our knowledge, the presented approach is novel to the problem of survival analysis using high-resolution pathology images.
+
+\section{Outline}
+
+The remainder of this thesis is structured as follows. 
+First, a background on the main concepts of this work is established. This comprises a primer on survival analysis, an overview over multimodal methods in deep learning and techniques specific to deep learning, as well as a brief summary about clear cell renal cell carcinoma (ccRCC), the RCC subtype that is the focus of this thesis. 
+The second chapter shall give an overview of concepts of deep learning employed in digital pathology, first on whole slide images and then on multimodal data by elaborating on previous publications.
+Chapter \ref{MetMat} gives an overview of the structure and oddities of the data provided by the Hannover Medical School (MHH) and the approaches used to deal with that data efficiently. Furthermore, this section will give a detailed description of the neural network architectures used for each experiment.
+The aim of Chapter \ref{Results} is to present the results of each experiment, as well as to compare the impact different hyperparameters and fusion strategies have on the results.
+A discussion on the findings and possible improvements can be found in chapter \ref{Discussion}. Lastly, the perspectives presented in Section \ref{conclusion} conclude this thesis.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+

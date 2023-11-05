@@ -1,0 +1,348 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% LaTeX-Rahmen fuer das Erstellen von Masterarbeiten
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% allgemeine Einstellungen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt,a4paper,twoside,]{report}
+%\usepackage{reportpage}
+\usepackage{epsf}
+\usepackage{graphics, graphicx}
+\usepackage{latexsym}
+\usepackage[margin=10pt,font=small,labelfont=bf]{caption}
+\usepackage[utf8]{inputenc}
+\usepackage[toc,page]{appendix}
+
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-}
+\usepackage{breakurl}
+\usepackage[breaklinks]{hyperref}
+
+\usepackage[square,numbers,comma]{natbib} %authoryear, semicolon
+\bibliographystyle{abbrvnat}
+
+% \usepackage{biblatex}
+% \addbibresource{refs}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% custom imports
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+% \usepackage[english]{babel}
+\usepackage[iso,english]{isodate}
+\usepackage{float}
+\usepackage{paralist}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+% \pagestyle{fancy}
+\setlength{\headheight}{14.49998pt}
+\addtolength{\topmargin}{-2.49998pt}
+
+\textwidth 14cm
+\textheight 22cm
+\topmargin 0.0cm
+\evensidemargin 1cm
+\oddsidemargin 1cm
+\footskip 2cm
+\parskip0.5explus0.1exminus0.1ex
+
+
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyhead[LE,RO]{\thepage} % page number in the outer (i.e., right on odd pages, left on even pages) header position
+\fancyhead[RE]{\leftmark} % chapter name (if applicable) in the inner (i.e., left on odd pages, right on even pages) header position
+\fancyhead[LO]{\rightmark} % section name (if applicable) in the inner (i.e., left on odd pages, right on even pages) header position
+\renewcommand{\headrulewidth}{0.1pt} % header line thickness
+}
+\pagestyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\sloppy
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% hier steht die neue Titelseite 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+\begin{titlepage}
+ \begin{center}
+  {\LARGE Eberhard Karls Universit\"at T\"ubingen}\\
+  {\large Mathematisch-Naturwissenschaftliche Fakult\"at \\
+Wilhelm-Schickard-Institut f\"ur Informatik\\[4cm]}
+  {\huge Master Thesis Bioinformatics\\[2cm]}
+  {\Large\bf   Predictive immune biomarkers in renal cancer\\} 
+  {\small Compare immune landscape of tumors in native and transplanted (immunocompromised) kidneys \\[1.5cm]}
+ {\large Sean Patrick Klein}\\[0.5cm]
+{\today}\\[4cm]
+{\small\bf Reviewers}\\[0.5cm]
+  \parbox{7cm}{\begin{center}{\large Prof. Dr. Nico Pfeifer}\\
+   (Biomedizinische Informatik)\\
+  {\footnotesize Wilhelm-Schickard-Institut f\"ur Informatik\\
+	Universit\"at T\"ubingen}\end{center}}\hfill\parbox{7cm}{\begin{center}
+  {\large Prof. Dr. Tim Kacprowski}\\
+  (Data Science in Biomedicine)\\
+  {\footnotesize Reichertz Institut f\"ur Medizinische Informatik \\
+	Technische Universit\"at Braunschweig}\end{center}
+ }
+  \end{center}
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Titelr"uckseite: Bibliographische Angaben
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{minipage}{11.2cm}
+\textbf{Klein, Sean:}\\
+\emph{Predictive immune biomarkers in renal cancer: Compare immune landscape of tumors in native and transplanted (immunocompromised) kidneys}\\ Master Thesis Bioinformatics\\
+Eberhard Karls Universit\"at T\"ubingen\\
+Thesis period: 2022-11-01 to 2023-04-30
+\end{minipage}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Seite I: Zusammenfassug, Danksagung
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section*{Abstract}
+
+This thesis presents a new approach to search for predictive biomarkers that evaluate the survival chances of cancer patients. This is done on the example of renal cell carcinoma. As this type of kidney cancer has multiple subtypes which furthermore suffer from tumour heterogeneity, defining a conclusive set of biomarkers remains challenging.
+By utilising multimodal deep learning by combining high-resolution tissue scans with gene expression counts, a model for the evaluation of survival of cancer patients is developed. Recent interpretability methods are applied to detect attributed areas of the tissue. 
+Specific immune cell clusters in the vicinity of tumour tissue, where they form dense groups as well as sub-regions within the tumour, that are located nearby the borders of vital and other tumour tissue, are identified as new and promising biomarkers.
+
+
+% \newpage
+\clearpage
+\section*{Zusammenfassung}
+
+In dieser Arbeit wird ein neuer Ansatz für die Suche nach prädiktiven Biomarkern vorgestellt. 
+elche die Überlebenschancen von Krebspatienten bewerten. Dies geschieht am Beispiel des Nierenzellkarzinoms. Da es bei dieser Art von Nierenkrebs mehrere Subtypen gibt, die zudem von Tumorheterogenität betroffen sind, bleibt die Definition eines eindeutigen Satzes von Biomarkern eine Herausforderung.
+Durch den Einsatz von multimodalem Deep Learning, bei dem hochauflösende Gewebescans mit Genexpressionsdaten kombiniert werden, wird ein Modell für die Bewertung des Überlebens von Krebspatienten entwickelt. Aktuelle Interpretationsmethoden werden angewandt, um attributierte Bereiche des Gewebes zu erkennen. 
+Spezifische Immunzellcluster nahe des Tumorgewebes die dort verdichtete Gruppen bilden, sowie 
+Tumorsubregionen nahe der Grenze zwischen vitalem und anderem Tumorgewebe werden als neue und vielversprechende Biomarker identifiziert.
+
+% \newpage
+\clearpage
+
+\section*{Acknowledgements}
+
+\noindent
+
+I would like to express my deepest appreciation to Prof. Dr. Tim Kacprowski for allowing me to write my thesis under his supervision and to his whole team for their support. Furthermore, I would like to extend my sincere thanks to Prof. Dr.-Ing. Martin Eisemann from the Technical University Braunschweig for his advice. Lastly, I’d like to recognize Prof. Dr. med. Jan Hinrich Bräsen and Jessica Schmitz from the MHH for their provision of the data and their assistance in understanding the medical backgrounds of this thesis.
+
+This study was supported by the Else Kröner-Fresenius-Stiftung (Promotionsprogramm DigiStrucMed 2020\_EKPK.20)
+\noindent
+
+
+% \cleardoublepage
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Table of Contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \renewcommand{\baselinestretch}{1.3}
+% \small\normalsize
+
+\tableofcontents
+
+% \renewcommand{\baselinestretch}{1}
+% \small\normalsize
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% List of Figures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\baselinestretch}{1.3}
+\small\normalsize
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% List of tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\baselinestretch}{1.3}
+\small\normalsize
+
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% List of abbreviations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% can be removed
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\chapter*{List of Abbreviations\markboth{LIST OF ABBREVIATIONS}{LIST OF ABBREVIATIONS}}
+
+
+\begin{tabbing}
+\textbf{Dummy}     \= Dummy \kill % this is needed, \= acts as anchor for following \>
+\textbf{ADP} \> Alpha Dropout\\
+\textbf{AJCC} \> American Joint Committee on Cancer\\
+\textbf{ANN} \> Artifical Neural Network \\
+\textbf{ccRCC} \> Clear Cell Renal Cell Carcinoma\\
+\textbf{CD} \> Cluster of Differentiation\\ 
+\textbf{chRCC} \> chromophore Clear Cell Carcinoma\\
+\textbf{CI} \> Concordance Index\\
+\textbf{CNN} \> Convolutional Neural Networks\\
+\textbf{CPH} \> Cox Proportional Hazard \\
+\textbf{CSV} \> Comma separated values\\
+\textbf{CT} \> Computed Tomography \\
+\textbf{DNN} \> Deep Neural Network\\
+\textbf{ELU} \> Exponential Linear Unit\\
+\textbf{FC} \>  Fully connected\\
+\textbf{FCL} \> Fully connected layer\\
+\textbf{fM} \> Femtomolar\\
+\textbf{FSDP} \> Fully Sharded Data Parallel\\
+\textbf{GBMLGG} \> Glioblastoma \& Lower Grade Glioma\\
+\textbf{GCN} \> Graph Convolutional Networks\\
+\textbf{H\&E} \> Haematoxylin and Eosin\\
+\textbf{HR} \>  Hazard Ratio\\
+\textbf{IG} \> Integrated Gradients\\
+\textbf{IHC} \> Immunohistochemistry\\
+\textbf{JSON} \> JavaScript object notation\\
+\textbf{KL} \> Kullback–Leibler\\
+\textbf{LOD} \> Limit of detection\\
+\textbf{LR} \> learning Rate\\
+\textbf{LRP} \> Layer-wise relevance propagation\\
+\textbf{LTSM} \> Long Short-Term Memory\\
+\textbf{MCAT} \> Multimedial Co-Attention Transformer\\
+\textbf{MHH} \> Hannover Medical School \\
+\textbf{MIL} \> Multiple Instance Learning\\
+\textbf{miRNA} \> microRNA \\
+\textbf{MSR1} \> Macrophage scavenger receptor \\
+\textbf{MSR1} \> Macrophage scavenger receptor 1\\
+\textbf{PBRM-1} \> Protein polybromo-1\\
+\textbf{PLRI} \> Peter L. Reichertz Institute for Medical Informatics\\
+\textbf{pRCC} \> Papillary Clear Cell Carcinoma\\
+\textbf{QC} \> Quality Control \\
+\textbf{RCC} \> Renal Cell Carcinoma\\
+\textbf{ReLU}\> Rectified linear unit\\
+\textbf{RGB} \> Red-Green-Blue\\
+\textbf{RNN} \> Recurrent Neural Networks\\
+\textbf{RSF} \> Random survival forests\\
+\textbf{SeLU} \> Scaled Exponential Linear Unit\\
+\textbf{SGD} \>  Stochastic Gradient Descen\\
+\textbf{SIFT} \> Scale Invariant Feature Transform\\
+\textbf{SNN} \> Self-Normalizing Networks\\
+\textbf{SR-A)} \> Scavenger receptor A\\
+\textbf{SVS} \> ScanScope Virtual Slides\\
+\textbf{SWA} \> Stochastic weight averaging\\
+\textbf{TNM} \> Tumor, Node, Metastasis\\
+\textbf{US} \> Ultrasonic Sound \\
+\textbf{VAE} \> Variational Autoencoder\\
+\textbf{VHL} \> Von Hippel–Lindau\\
+\textbf{VQ-VAE} \> Vector Quantised-Variational AutoEncoder\\
+\textbf{WSI} \> Whole Slide Images\\
+
+\end{tabbing}
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Der Haupttext, ab hier mit arabischer Numerierung
+%%% Mit \input{dateiname} werden die Datei `dateiname' eingebunden
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%% Introduction
+\input{intro}
+\cleardoublepage
+
+%% Background
+\input{background}
+\cleardoublepage
+
+%% related Work
+\input{related_work}
+\cleardoublepage
+
+%% 
+\input{MM}
+\cleardoublepage
+
+%%
+\input{results}
+\cleardoublepage
+
+%%
+\input{discussion}
+\cleardoublepage
+
+%%
+\input{conclusion}
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\input{appendix}
+
+
+% \end{appendices}
+
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Bibliographie
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\addcontentsline{toc}{chapter}{Bibliography}
+
+% \printbibliography
+\bibliography{refs}
+%% Obige Anweisung legt fest, dass BibTeX-Datei `refs.bib' verwendet
+%% wird. Hier koennen mehrere Dateinamen mit Kommata getrennt aufgelistet
+%% werden.
+
+\cleardoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Erklaerung
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\thispagestyle{empty}
+\section*{Selbst\"andigkeitserkl\"arung}
+
+Hiermit versichere ich, dass ich die vorliegende Masterarbeit 
+selbst\"andig und nur mit den angegebenen Hilfsmitteln angefertigt habe und dass alle Stellen, die dem Wortlaut oder dem 
+Sinne nach anderen Werken entnommen sind, durch Angaben von Quellen als 
+Entlehnung kenntlich gemacht worden sind. 
+Diese Masterarbeit wurde in gleicher oder \"ahnlicher Form in keinem anderen 
+Studiengang als Pr\"ufungsleistung vorgelegt. 
+
+\vskip 3cm
+
+Ort, Datum	\hfill Unterschrift \hfill 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Ende
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+

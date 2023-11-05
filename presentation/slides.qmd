@@ -1,0 +1,653 @@
+---
+title: "Predictive immune biomarkers in renal cancer"
+# subtitle: "Compare immune landscape of tumors in native and transplanted (immunocompromised) kidneys"
+author: "Sean Klein"
+institute: "University Tübingen"
+date: today
+date-modified: 2022-06-04
+date-format: iso
+format:
+  revealjs:
+    pdf-separate-fragments: true
+    chalkboard: true
+    controls-layout: bottom-right
+    controls: true
+    navigation-mode: linear #vertical
+    reference-location: document
+    slide-number: c
+    theme: [default, style.scss]
+    touch: false
+    transition-speed: "fast"
+    # transition: "slide"
+    sc-sb-title: true
+    hide-from-titleSlide: "text"
+    header: "Sean Klein"
+    menu: 
+      width: normal
+      numbers: true
+smooth-scroll: false
+bibliography: "../latex/refs.bib"
+citation-location: document
+search: false
+# footer: "Sean Klein"
+revealjs-plugins:
+  - attribution
+  - pointer
+include-in-header:
+  - text: |
+      <style>
+      #title-slide .title {
+        font-size: 2.0em;
+        color: #2a76dd;
+      }
+      </style>
+filters:
+  - reveal-header
+---
+
+# Introduction {background-color="#3c3f44"}
+
+<!---
+ ## Aim 
+
+- Biomarker Detection in tissue of renal cell carcinoma (RCC) patients 
+    - Multimodal neural networks
+    - Interpretability methods
+
+ ::: {layout-valign="center"}
+
+Biomarker-detection in tissue of renal cell carcinoma patients using multimodal neural networks.
+
+::: 
+---> 
+
+## Overview
+
+- Aim: Detection of novel biomarkers in renal cell carcinoma (RCC) patients
+  <!---
+ - Regions of Interest
+  - Multimodal neural networks
+  - Interpretability methods 
+--->
+- Multimodal neural networks
+- Available data 
+  - Whole Slide Images (WSI)
+  - Gene Expression counts (Subcohort)
+
+
+## Motivation
+
+- RCC is a complex disease
+  - No well-defined heterogeneity
+  - 40% of patients treated with surgery experience recurrence
+- Deep learning promises to better model this complexity
+- Unimodal networks do not provide the "full picture"
+- Multimodal networks promise better results
+
+
+::: footer
+@Hancock2023Kidney, @Capitanio2016Feb
+::: 
+
+<!---
+ ## Renal Cell Carcinoma (RCC)
+
+- 40% of patients treated with surgery experience recurrence
+- 17% of patients: distant metastases at the time of diagnosis
+- No well-defined heterogeneity
+- Risk factors: Smoking, Alcohol, BMI, Type 2 diabetes, Hypertension, etc.
+
+::: footer
+@Hancock2023Kidney, @Capitanio2016Feb
+::: 
+--->
+
+# Background {background-color="#3c3f44" }
+
+## Survival Analysis 
+
+- Expected duration until an event occurs
+  - Time-to-Event data
+  - Given: Event has not yet occurred
+- Survival function: 
+  - Probability that event has not yet occurred at time $t$
+- Hazard function: 
+  - Probability of event occurring at time $t$ divided by $\delta t$
+  - Trends to 0 with shrinking $\delta t$, hazard $h(t) \in [0,\infty]$
+
+<!---
+ ## Hazard function and hazards {visibilty="hidden"}
+
+$$
+h(t) = \lim_{\Delta t \to 0} \frac{P(T < t+\Delta t| T\geq t)}{\Delta t} \ge 0
+$$ 
+--->
+
+## Censored Data
+
+::: {layout-ncol="2"}
+- Premature removal from study
+- Event did not occured yet
+- Only right-censoring due to the study design
+- All patients already affected at $t=0$
+
+![Time in days](./assets/surv_race_rcc.png)
+:::
+
+## Concordance Index (CI) I 
+
+- Main metric for evaluation of performance
+- Accuracy of the *ranking* of predictions
+- Calculation: Pairwise comparisons
+  - Concordant if higher prediction & lower true survival
+  - 1 if concordant, else 0
+  - Average of binary results $\rightarrow c \in [0,1]$
+
+<!---
+ 0.5 - Expected result from random predictions,
+1.0 - Perfect concordance and,
+0.0 - Perfect anti-concordance 
+--->
+
+## Concordance Index (CI) II
+
+```{dot}
+//| fig-height: 4
+//| fig-cap: Uncensored samples are compared to all samples with later event occurence.
+digraph {
+    splines="polyline";
+    ranksep="1";
+    nodesep=1.0;
+    margin=0;
+    subgraph main {
+        node [shape="circle"];
+        a [shape="square"];
+        b [shape="square"];
+        c [shape="square"];
+        {rank="same"; a x b y c };
+        a -> x; b -> y; c ;
+        b:s -> {c};
+        a:n -> {b y c };
+        edge[weight=2];
+        a -> Time [style="invisible", arrowhead=none];
+        End -> c [style="invisible", arrowhead=none];
+    };
+    subgraph timeline {
+        rank="same"
+        Time [shape="ellipse"]
+        End [style="invisible"]
+        Time -> End
+    }
+}
+```
+
+::: {.notes}
+https://stats.stackexchange.com/a/478305
+:::
+
+## Multimodal Networks
+
+::: {layout-ncol="2"}
+- Usage of multiple modalities
+  - Different kinds of data
+  - Domain-specific
+- Multimodal fusion 
+  - Three general types
+  - Varying time-point
+  - Learned correlations vary
+
+![Intermediate Fusion](assets/graphviz/intermed_fusion.png)
+:::
+
+## Interpretability methods
+
+- Score attention of network to each feature
+- Usage for biomarker detection
+  - Compute attribution of pixels in WSI
+  - Tissue regions of interest
+- Post-Training procedure $\rightarrow$ No re-training needed
+
+# Related Work {background-color="#3c3f44"}
+
+## General
+
+- First adaption of neural networks to Cox proportional hazards
+model (CPH) by @Faraggi1995neural
+  - CPH: linear regression model for survival analysis
+- DeepSurv: first usage of "modern" deep learning techniques by @Katzman2018DeepSurv
+- Highest reported C-Index for RCC: 0.808 by @Ning2020Integrative
+  - Eigengenes (RNA-Seq)
+  - Non-overlapping image patches
+
+## PathomicFusion I
+
+::: {layout="[40,60]" layout-valign="top"}
+
+![](./assets/PathFusion0.jpg)
+
+- Whole Slide image patches
+- Graph convolutional network
+  - Cell detection and localisation
+  - K-nearest Neighbor
+- Self-Normalizing Networks (SNN)
+  - Zero mean and unit variance
+  - Lower risk of Overfitting
+
+:::
+
+::: footer
+@Chen2022Pathomic, figure modified
+:::
+
+::: {.notes}
+Alpha Dropout: Randomly masks some elements of input tensor with probability p using samples from a bernoulli distribution. The elements are randomized on every forward call, and scaled and shifted to maintain zero mean and unit standard deviation.
+
+SNN: SELU + Alpha Dropout => self-normalising property
+:::
+
+
+## PathomicFusion II
+
+::: {layout="[45,55]" layout-valign="top"}
+
+- Attention Mechanism
+  - Controls expressivness or vector size
+  - Weaken noisy features
+- Kronecker product
+  - Same-time fusion
+  - Pair-wise interactions
+
+![](./assets/PathFusion.jpg)
+
+:::
+
+::: footer
+@Chen2022Pathomic, modified
+:::
+
+## EmbraceNet
+
+::: {layout="[50,50]"}
+
+![](./assets/embracenet_structure.png)
+
+- Docking Layer
+  - Independent unimodal networks
+  - Create common-size outputs
+- Embracement Layer
+  - Stochastic sampling
+  - Input-sized fusion vector
+
+:::
+
+::: footer
+@Choi2019EmbraceNet
+:::
+
+# Material & Methods {background-color="#3c3f44"}
+
+## Censored Samples
+
+- Patients of the Hannover Medical School (MHH)
+- From 171 to 141 patients due to filtering
+- Filtering 
+  - Data issues (missing dates, images unavailable)
+  - Subtype: clear cell renal cell carcinoma (ccRCC)
+- Subcohort of 24 with gene expression data
+- Total time span: 1992 and 2022
+
+## Survival Time 
+
+Date of nephrectomy to recorded date of death / last check-up
+
+![](./assets/survival_days_distribution_hires_evenly_binned.png){.r-stretch}
+
+
+## Whole Slide Images
+
+::: {layout="[60, 40]" layout-valign="center"}
+
+- Around $10^9$ pixels large
+- Pre-computed lower resolutions
+- Five images per patient
+- Differently stained
+    - Haematoxylin and Eosin (H&E)
+    - Immunohistochemistry:      
+      CD68; CD204; CD8 and CD20; CD4 and FoxP3
+
+[![](./assets/Image_pyramid_centered.png){fig-align="center"}](https://commons.wikimedia.org/wiki/File:Image_pyramid.svg)
+
+
+:::
+
+::: {.attribution}
+[Creative Commons BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+:::
+
+::: {.footer}
+@Cmglee2015Illustration, modified with [Inkscape](https://inkscape.org/)
+:::
+
+## 
+
+![](./assets/postproc_subimage_90-19.png){fig-align="center"}
+
+::: {style="text-align: center"}
+Area varies per image per annotation!
+<!--- Not all annotations are created equal!  --->
+:::
+
+## Data Cleanup - Scanning Artifacts
+
+::: {layout="[[65,35]]"}
+
+- Slide contaminations
+- Scanning process 
+  - Filters empty tiles
+  - Failed in some cases
+- Usage of disk space
+- Solution: Annotation-based Cropping
+
+![](./assets/shitty_scan_cropped.png)
+
+::: 
+
+## 
+
+::: {layout-nrow="4" layout-align="center"}
+![](./assets/AAA_postproc_subimage_3-1.png){width=80% fig-align="center"}
+![](./assets/AAA_postproc_subimage_12-1.png){width=80% fig-align="center"}
+![](./assets/AAA_postproc_subimage_19-1.png){width=80% fig-align="center"}
+![](./assets/AAA_postproc_subimage_158-1.png){width=80% fig-align="center"}
+:::
+
+## Gene Expression Data
+
+::: {layout-ncol="2"}
+
+- nCounter® PanCancer IO 360™ Panel by Nanostring
+- Molecular barcodes
+- 750 genes: tumour, microenvironment, and immune response
+- 14 out of the 24 patients were censored
+
+![](./assets/Nanostring360_AI.jpeg)
+:::
+
+
+::: {.footer}
+@Cesano42, upscaled with [deepai.org](https://deepai.org/machine-learning-model/torch-srgan)
+:::
+
+::: {.attribution}
+[Creative Commons CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+:::
+
+# Results {background-color="#3c3f44"}
+
+## Network Training {.center}
+
+## WSI - Network architecture
+
+- Input - images at downsampled resolution
+  - Memory limitations
+- Output - Hazard / Input into CI
+- Convolutional neural network
+  - Modified ResNet architecture
+  - Convolutional layer to reduce input dimensions
+  - Fully connected head replaced with custom layers
+
+::: {.notes}
+hazard =  instantaneous rate at which an event of interest occurs, given that the event has not occurred up to a certain point in time
+
+- Batch size = 3
+- Gradient accumulation = 12
+- Multi GPU + Gradient synchronisation
+:::
+
+## WSI - Model Capability {visibilty="hidden"}
+
+::: {layout-ncol=2 style="text-align: center"}
+![Full Dataset](./assets/WSI/!!!_2023-04-03.png)
+
+![Subset of 5%](./assets/WSI/!!!_overfit0.05.png)
+:::
+
+::: { style="text-align: center" }
+C-Index = 0.89
+:::
+
+## Genes - Self Normalizing networks
+
+- Type of fully connected network
+  - Scaled exponential linear unit (SeLU)
+  - Alpha dropout layer
+- Outputs $\rightarrow$ zero mean & unit variance
+- Counteract vanishing/exploding gradient problem
+- Applied to our data
+  - Strong overfitting after certain amount of epochs
+  - Multiples parameters explored - Unsuccessfull
+
+## Genes - Learning rates
+
+::: {layout-ncol="3" style="text-align: center"}
+![$1e-4$](./assets/SNN/SNNet_fsz250_1e-4_2500epochs.png)
+
+![$1e-5$](./assets/SNN/SNNet_fsz250_1e-5_2500epochs.png)
+
+![$1e-6$](./assets/SNN/SNNet_fsz250_1e-6_2500epochs.png)
+:::
+
+Lowering or raising learning rate worsens loss considerably
+
+## Network Fusion{.center}
+
+## Fusion experiments - 2 Issues
+
+- Different Learning rates
+  - Sub-networks with individual learning rates
+  - Solution: Variable learning rates for sub-networks and $1e{-3}$ post fusion
+- Number of epochs
+  - Aim for 500 (same as WSI network)
+  - Only 300 due to thesis deadline
+
+## Fusion experiments - Approaches 
+
+- Comparison of fusion methods
+  - Element-wise summation and maximum
+  - Vector concatenation
+  - Probabilistic selection from EmbraceNet
+  - Attention-based summation
+  - Pathomic Fusion - Attention-Gating & Kronecker Product
+- Only Difference: fusion method / fusion layers
+
+## {.smaller .center}
+
+:::: {.columns style="text-align: center"}
+
+::: {.column width="33.3%"}
+![Elementwise summation](./assets/fusions/loss_sum.png)
+
+![Elementwise maximum](./assets/fusions/loss_max.png)
+:::
+
+::: {.column width="33.3%"}
+![Vector Concatenation](./assets/fusions/loss_cat.png)
+
+![Attention Mechanism](./assets/fusions/loss_attention.png)
+:::
+
+::: {.column width="33.3%"}
+![Probability-based Sampling](./assets/fusions/loss_embrace.png)
+
+![Pathomic Fusion](./assets/fusions/loss_kronecker.png)
+:::
+
+::::
+
+## Fusion experiments - C-Indices {.center} 
+<!-- style="text-align: center" -->
+
+<!---
+ | Experiment   | Training | Validation | Test   |
+|--------------|:--------:|:----------:|:------:|
+| Maximum      | 0\.594   | 0\.590     | **0\.618** |
+| Summation    | 0\.637   | **0\.651** | 0\.566 |
+| Concatenated | **0\.709**   | 0\.522 | 0\.589 |
+| EmbraceNet   | 0\.596   | 0\.644     | 0\.486 |
+| Attention    | 0\.492   | 0\.500     | 0\.549 |
+| Kronecker    | 0\.580   | 0\.594     | 0\.612 | 
+--->
+
+
+| Experiment   | Training | Validation |
+|--------------|:--------:|:----------:|
+| Maximum      | 0\.594   | 0\.590     |
+| Summation    | 0\.637   | **0\.651** |
+| Concatenated | **0\.709**   | 0\.522 |
+| EmbraceNet   | 0\.596   | 0\.644     |
+| Attention    | 0\.492   | 0\.500     |
+| Kronecker    | 0\.580   | 0\.594     |
+
+## Interpretatbility {.center}
+
+::: {.callout-important collapse="true" appearance="simple" }
+## Disclaimer
+
+The unimodal whole slide image network was used for the following!
+:::
+
+## Integrated Gradients 
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/integrated_gradients_abs_case111-stain1-censored_3499days.png)
+:::
+
+
+## Grad-CAM 
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/guided_gradcam_pos_case111-stain1-censored_3499days.png)
+
+:::
+
+## Saliency
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/saliency_case111-stain1-censored_3499days.png)
+
+:::
+
+## Occlusion 
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/Occlusion_abs_case111-stain1-censored_3499days.png)
+
+:::
+
+## Importance of Annotations
+
+::: {layout-ncol="3" style="text-align: center"}
+![Reference](./assets/interpret/masks_case129-stain19-dead_414days.png)
+
+![Integrated Gradients](./assets/interpret/integrated_gradients_abs_case129-stain19-dead_414days.png)
+
+![GradCAM](./assets/interpret/guided_gradcam_pos_case129-stain19-dead_414days.png)
+:::
+
+## Other Regions
+
+::: {layout-ncol="3" style="text-align: center" layout-valign="bottom"}
+![Reference](./assets/interpret/121/masks_case121-stain19-censored_1119days.png)
+
+![Integrated Gradients](./assets/interpret/121/integrated_gradients_abs_case121-stain19-censored_1119days.png)
+
+![GradCAM](./assets/interpret/121/guided_gradcam_pos_case121-stain19-censored_1119days.png)
+:::
+
+## Same Patterns without Annotation 
+
+::: {layout-ncol="4" style="text-align: center" layout-valign="bottom"}
+![H&E Stain](assets/interpret/13/masks_case13-stain1-dead_2415days.png)
+
+![Integrated Gradients](assets/interpret/13/integrated_gradients_abs_case13-stain1-dead_2415days.png)
+
+![IHC - CD4 & FoxP3](assets/interpret/13/masks_case13-stain41-dead_2415days.png%0D) 
+
+![Integrated Gradients](assets/interpret/13/integrated_gradients_abs_case13-stain41-dead_2415days.png%0D) 
+:::
+
+
+# Discussion {background-color="#3c3f44"}
+
+## Technical limitations 
+
+- Low batch size
+    - Ideal: Process full data set at once
+    - Else: Approximation of true survival function
+- Training time
+    - 10+ hours for WSI networks 
+    - Slow iteration
+
+## Concerns
+
+- Data separation by image rather than patient
+  - Training set and test set contain similar images
+  - May lead to memorization of outer appearance
+- Loss of Information due to downsampling
+- Strong influence introduced by annotations
+
+## Data - Quality and Amount
+
+- Too few gene expression samples 
+  - Late fusion might be more suitable
+- Discarded: images with unannotated / mislabelled regions
+- Irregularities impact results
+  - Microarray sampling
+  - Slide preparation
+
+
+## Cut off tissue
+
+::: {layout-nrow=2}
+
+![](./assets/BottomCutOff2Small.png)
+
+- Parts of tissue missing from scan
+- Potenitally valuable information
+
+:::
+
+## Original contribution
+
+- Stacking annotations as pixel-masks on top of images
+
+::: {layout-ncol="2" style="text-align: center"}
+- Comparison of different fusion approaches
+- Annotation-based patch extraction (not used)
+
+![Extracted Patches](assets/postproc_subimage.png){width="80%"}
+:::
+
+## Future Work
+
+- Investigate interesting regions
+- Acquire more gene expression data
+- Aim to increase batch size
+- Investigate relevance of annotations
+- Perform proper hyperparameter search
+- Investigate differences of interpretability methods
+
+# Thank you! {background-color="#3c3f44"}
+
+## References 
+
+::: {#refs}
+:::

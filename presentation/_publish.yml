@@ -1,0 +1,8 @@
+- source: slides.qmd
+  quarto-pub:
+    - id: ab94b623-cff8-4f43-82f8-37ea69fb0a94
+      url: 'https://quartopub.com/sites/seapat/renal-cancer-dl'
+    - id: 23a8585a-19f4-41a5-a86c-3f3cf16779c8
+      url: 'https://quartopub.com/sites/seapat/digistrucmed2023-3'
+    - id: ae2f2ec6-7c01-4744-b350-a8aca6af888d
+      url: 'https://quartopub.com/sites/seapat/thesis-defense'
