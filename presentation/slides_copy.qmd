@@ -1,0 +1,367 @@
+---
+title: "Predictive immune biomarkers in renal cancer"
+# subtitle: "Compare immune landscape of tumors in native and transplanted (immunocompromised) kidneys"
+author: "Sean Klein"
+institute: "University Tübingen"
+date: today
+date-modified: 2022-06-04
+date-format: iso
+format:
+  revealjs:
+    pdf-separate-fragments: true
+    chalkboard: false
+    controls-layout: bottom-right
+    controls: true
+    navigation-mode: linear #vertical
+    reference-location: document
+    slide-number: c
+    theme: [default, style.scss]
+    touch: false
+    transition-speed: "fast"
+    # transition: "slide"
+    sc-sb-title: true
+    hide-from-titleSlide: "text"
+    # header: "Sean Klein"
+    menu: 
+      width: normal
+      numbers: true
+smooth-scroll: false
+bibliography: "../latex/refs.bib"
+citation-location: document
+search: false
+# footer: "Sean Klein"
+revealjs-plugins:
+  - attribution
+  - pointer
+include-in-header:
+  - text: |
+      <style>
+      #title-slide .title {
+        font-size: 2.0em;
+        color: #2a76dd;
+      }
+      </style>
+filters:
+  - reveal-header
+---
+
+## Overview
+::: {layout-ncol="2"}
+-   Biomarkers in renal cell carcinoma patients
+    -   Prediction of Hazard
+    -   Methods of explainable AI
+-   Multimodal fusion networks
+    -   Whole Slide Images (WSI)
+    -   Gene Expression counts (subcohort)
+
+![Intermediate Fusion](assets/graphviz/intermed_fusion.png)
+:::
+
+# Introduction {.center background-color="#3c3f44" visibility="hidden"}
+
+## Survival Analysis & Censored Data
+
+::: {layout-ncol="2"}
+-   Time-to-Event data
+-   Censored: Premature removal from study
+-   Right-censoring: All patients already affected at $t=0$
+
+![Time in days](./assets/surv_race_rcc.png)
+:::
+
+## Concordance Index (CI) 
+
+Average of pairwise comparisons whether prediction agree with survival time
+
+```{dot}
+//| fig-height: 4
+//| fig-cap: Uncensored samples are compared to all samples with later event occurence.
+digraph {
+    splines="polyline";
+    ranksep="1";
+    nodesep=1.0;
+    margin=0;
+    subgraph main {
+        node [shape="circle"];
+        a [shape="square"];
+        b [shape="square"];
+        c [shape="square"];
+        {rank="same"; a x b y c };
+        a -> x; b -> y; c ;
+        b:s -> {c};
+        a:n -> {b y c };
+        edge[weight=2];
+        a -> Time [style="invisible", arrowhead=none];
+        End -> c [style="invisible", arrowhead=none];
+    };
+    subgraph timeline {
+        rank="same"
+        Time [shape="ellipse"]
+        End [style="invisible"]
+        Time -> End
+    }
+}
+```
+
+::: notes
+https://stats.stackexchange.com/a/478305
+:::
+
+## Censored Samples
+
+::: {layout="[60, 40]" layout-valign="center"}
+-   Patients of the Hannover Medical School (MHH)
+-   Five images (chemical stains) per 141 patients   
+-   Haematoxylin and Eosin (H&E) and Immunohistochemistry
+-   Subcohort of 24 with gene expression data
+
+[![](./assets/Image_pyramid_centered.png){fig-align="center"}](https://commons.wikimedia.org/wiki/File:Image_pyramid.svg)
+:::
+
+::: attribution
+[Creative Commons BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
+:::
+
+::: footer
+@Cmglee2015Illustration, modified with [Inkscape](https://inkscape.org/)
+:::
+
+## Annotations {.smaller style="text-align: center"}
+
+![](./assets/postproc_subimage_90-19.png){fig-align="center"}
+
+
+## {.smaller }
+
+::: {layout-nrow=4 fig-align="center"}
+![](./assets/AAA_postproc_subimage_3-1.png){width="80%" fig-align="center"} 
+![](./assets/AAA_postproc_subimage_12-1.png){width="80%" fig-align="center"} 
+![](./assets/AAA_postproc_subimage_19-1.png){width="80%" fig-align="center"} 
+![](./assets/AAA_postproc_subimage_158-1.png){width="80%" fig-align="center"}
+:::
+
+<!-- ## Gene Expression Data
+
+::: {layout-ncol="2"}
+-   nCounter® PanCancer IO 360™ Panel by Nanostring
+-   Molecular barcodes
+-   750 genes: tumour, microenvironment, and immune response
+-   14 out of the 24 patients were censored
+
+![](./assets/Nanostring360_AI.jpeg)
+::: 
+
+::: footer
+@Cesano42, upscaled with [deepai.org](https://deepai.org/machine-learning-model/torch-srgan)
+:::
+
+::: attribution
+[Creative Commons CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+:::
+-->
+
+<!-- # Results {background-color="#3c3f44"} -->
+
+<!-- ## Network Training {.center} -->
+
+<!-- ## WSI - Network architecture
+
+-   Input - images at downsampled resolution
+    -   Memory limitations
+-   Output - Hazard / Input into CI
+-   Convolutional neural network
+    -   Modified ResNet architecture
+    -   Convolutional layer to reduce input dimensions
+    -   Fully connected head replaced with custom layers
+
+::: notes
+hazard = instantaneous rate at which an event of interest occurs, given that the event has not occurred up to a certain point in time
+
+-   Batch size = 3
+-   Gradient accumulation = 12
+-   Multi GPU + Gradient synchronisation
+::: -->
+
+# Training {.center background-color="#3c3f44" visibility="hidden"}
+
+## WSI - Model Capability {visibilty="hidden"}
+
+::: {layout-ncol="2" style="text-align: center"}
+![Full Dataset](./assets/WSI/!!!_2023-04-03.png)
+
+![Subset of 5%](./assets/WSI/!!!_overfit0.05.png)
+:::
+
+::: {style="text-align: center"}
+C-Index = 0.89
+:::
+
+<!-- ## Genes - Self Normalizing networks
+
+-   Type of fully connected network
+    -   Scaled exponential linear unit (SeLU)
+    -   Alpha dropout layer
+-   Outputs $\rightarrow$ zero mean & unit variance
+-   Counteract vanishing/exploding gradient problem
+-   Applied to our data
+    -   Strong overfitting after certain amount of epochs
+    -   Multiples parameters explored - Unsuccessfull -->
+
+## Gene data: Self Normalizing networks
+
+::: {layout-ncol="3" style="text-align: center"}
+![$1e-4$](./assets/SNN/SNNet_fsz250_1e-4_2500epochs.png)
+
+![$1e-5$](./assets/SNN/SNNet_fsz250_1e-5_2500epochs.png)
+
+![$1e-6$](./assets/SNN/SNNet_fsz250_1e-6_2500epochs.png)
+:::
+
+Lowering or raising learning rate worsens loss considerably
+
+<!-- ##  Fusion experiments - Approaches {.smaller .center}
+
+::: {.columns style="text-align: center"}
+::: {.column width="33.3%"}
+![Elementwise summation](./assets/fusions/loss_sum.png){width=85%}
+
+![Elementwise maximum](./assets/fusions/loss_max.png){width=85%}
+:::
+
+::: {.column width="33.3%"}
+![Probability-based Sampling](./assets/fusions/loss_embrace.png){width=85%}
+
+![Pathomic Fusion](./assets/fusions/loss_kronecker.png){width=85%}
+:::
+
+::: {.column width="33.3%"}
+![Vector Concatenation](./assets/fusions/loss_cat.png){width=85%}
+
+![Attention Mechanism](./assets/fusions/loss_attention.png){width=85%}
+:::
+::: -->
+
+## Fusion experiments - C-Indices {.center}
+
+| Experiment   | Training  | Validation |
+|--------------|:---------:|:----------:|
+| Maximum      |   0.594   |   0.590    |
+| Summation    |   0.637   | **0.651**  |
+| Concatenated | **0.709** |   0.522    |
+| EmbraceNet   |   0.596   |   0.644    |
+| Attention    |   0.492   |   0.500    |
+| Kronecker    |   0.580   |   0.594    |
+
+<!--  ## Integrated Gradients
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/integrated_gradients_abs_case111-stain1-censored_3499days.png)
+:::
+
+## Grad-CAM
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/guided_gradcam_pos_case111-stain1-censored_3499days.png)
+:::
+
+## Saliency
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/saliency_case111-stain1-censored_3499days.png)
+:::
+
+## Occlusion
+
+::: {layout="[ -0.07, 0.42, 0.44, -0.07]" style="text-align: center"}
+![](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![](./assets/interpret/Occlusion_abs_case111-stain1-censored_3499days.png)
+::: -->
+
+# Interpretability {.center background-color="#3c3f44" visibility="hidden"}
+
+## Attention correlates with Annotation
+
+::: {layout-nrow=1 style="text-align: center"}
+![Reference](./assets/interpret/masks_case111-stain1-censored_3499days.png)
+
+![Integrated Gradients](./assets/interpret/integrated_gradients_abs_case111-stain1-censored_3499days.png)
+
+![Grad-CAM](./assets/interpret/guided_gradcam_pos_case111-stain1-censored_3499days.png)
+
+![Occlusion](./assets/interpret/Occlusion_abs_case111-stain1-censored_3499days.png)
+:::
+<!-- ![Saliency](./assets/interpret/saliency_case111-stain1-censored_3499days.png) -->
+
+## Focus on Annotation varies
+
+::: {layout-ncol="3" style="text-align: center"}
+![Reference](./assets/interpret/masks_case129-stain19-dead_414days.png)
+
+![Integrated Gradients](./assets/interpret/integrated_gradients_abs_case129-stain19-dead_414days.png)
+
+![GradCAM](./assets/interpret/guided_gradcam_pos_case129-stain19-dead_414days.png)
+:::
+
+## Adjacent Clusters
+
+::: {layout-ncol="3" style="text-align: center" layout-valign="bottom"}
+![Reference](./assets/interpret/121/masks_case121-stain19-censored_1119days.png)
+
+![Integrated Gradients](./assets/interpret/121/integrated_gradients_abs_case121-stain19-censored_1119days.png)
+
+![GradCAM](./assets/interpret/121/guided_gradcam_pos_case121-stain19-censored_1119days.png)
+:::
+
+<!-- ## Same Patterns without Annotation
+
+::: {layout-ncol="4" style="text-align: center" layout-valign="bottom"}
+![H&E Stain](assets/interpret/13/masks_case13-stain1-dead_2415days.png)
+
+![Integrated Gradients](assets/interpret/13/integrated_gradients_abs_case13-stain1-dead_2415days.png)
+
+![IHC - CD4 & FoxP3](assets/interpret/13/masks_case13-stain41-dead_2415days.png%0D)
+
+![Integrated Gradients](assets/interpret/13/integrated_gradients_abs_case13-stain41-dead_2415days.png%0D)
+::: -->
+
+# Discussion {.center background-color="#3c3f44" visibility="hidden"}
+
+## Issues and Concerns
+
+-   Too few gene expression samples
+-   Data splitting for images
+    -   Images from same patients are considered independent
+    -   Different chemical stain but very similar shape
+-   Loss of Information due to downsampling
+-   Influence of annotations
+
+## Future Work
+
+- Investigate importance of Annotations
+  - Ablation experiments
+  - Interpretability method per channel
+  - Annotations as separate modality
+- Proper separation of data
+  - Validate results
+-   More gene expression data & clinical investigations
+
+<!-- ## Takeaway
+
+- Deep Learning promises exciting findings in medicine
+- Interpretabiltiy is especially important in medicine
+  - Transparency
+  - Both for Patients and Clinicians
+- Explainable AI as the main purpose -->
+
+# Thank you! {.center background-color="#3c3f44"}
+
+# References <!-- {background-color="#3c3f44"} -->
+::: {#refs}
+:::
